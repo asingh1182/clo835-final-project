@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  group_name: groupname16
+  image_uri: "https://group-16.s3.amazonaws.com/butterfly.jpeg"
+  # image_uri: https://finalproject16.s3.amazonaws.com/cats.jfif

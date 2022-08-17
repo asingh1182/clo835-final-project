@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-mysql
+  labels:
+    name: frontend-mysql
+spec:
+  selector:
+    matchLabels:
+      name: frontend-mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: frontend-mysql
+    spec:
+      serviceAccountName: group16
+      containers:
+        - name: frontend-mysql
+          image: 587065871033.dkr.ecr.us-east-1.amazonaws.com/app:v2
+          ports:
+            - containerPort: 81
+          env:
+            - name: group_name
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-config
+                  key: group_name
+            - name: image_uri
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-config
+                  key: image_uri
+            - name: DB_User
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_User      
+            - name: DB_Host
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: DB_Host
+            - name: DB_Database
+              value: mysql      
+          volumeMounts:
+            - name: app-secret-volumes
+              mountPath: "/opt/app-secret-volumes"
+              readOnly: true
+            - name: config-volume
+              mountPath: /clo835/config
+          envFrom:
+            - secretRef:
+                name: db-secret
+            - configMapRef:
+                name: mysql-config
+      volumes:
+        - name: app-secret-volumes
+          secret:
+            secretName: db-secret
+        - name: config-volume
+          configMap:
+            name: mysql-config
+            # items:
+            #   - key: image_uri
+            #     path: image_uri
